@@ -1,26 +1,59 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import { connect } from "react-redux";
+import * as courseActions from "./redux/actions/courseActions";
+import PropTypes from "prop-types";
+import { bindActionCreators } from "redux";
+
+class App extends Component {
+  // handleChange = (e) => {
+  //   const course = { ...this.state.course, title: e.target.value };
+  //   this.setState({ course });
+  // };
+
+  // handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   this.props.actions.createCourse(this.state.course);
+  // };
+
+  componentDidMount() {
+    this.props.actions.loadCourses().catch((error) => {
+      alert("Loading courses failed " + error);
+    });
+  }
+
+  render() {
+    return (
+      <>
+        <h2>Courses</h2>
+
+        {this.props.courses.map((course) => (
+          <div key={course.title}> {course.title}</div>
+        ))}
+      </>
+    );
+  }
 }
 
-export default App;
+App.propTypes = {
+  courses: PropTypes.array.isRequired,
+  actions: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = (state) => {
+  return {
+    courses: state.courses,
+  };
+};
+// const mapDispatchToProps = {
+//   createCurse: courseActions.createCourse,
+// };
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    actions: bindActionCreators(courseActions, dispatch),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
